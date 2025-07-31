@@ -3,6 +3,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import traceback
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'rahasia'  # Untuk flash messages
@@ -13,28 +14,35 @@ scope = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/spreadsheets"
 ]
-import os
-creds_dict = json.loads(os.getenv("GOOGLE_CREDS_JSON"))
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+
+client = None
+spreadsheet = None
+sheet = None
+SPREADSHEET_ID = "1u15SGd-ihsXwHMbw6kfWZzsfZnqaf2qIH-kFeNmQb4g"
 
 try:
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    # Load credentials dari environment variable
+    creds_json = os.getenv("GOOGLE_CREDS_JSON")
+    if not creds_json:
+        raise Exception("GOOGLE_CREDS_JSON environment variable not found.")
+
+    creds_dict = json.loads(creds_json)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
-    SPREADSHEET_ID = "1u15SGd-ihsXwHMbw6kfWZzsfZnqaf2qIH-kFeNmQb4g"
+    # Buka spreadsheet
     spreadsheet = client.open_by_key(SPREADSHEET_ID)
 
+    # Buka / buat sheet "JenisLomba"
     try:
         sheet = spreadsheet.worksheet("JenisLomba")
     except gspread.exceptions.WorksheetNotFound:
         sheet = spreadsheet.add_worksheet(title="JenisLomba", rows=100, cols=2)
         sheet.append_row(["Nama Lomba"])
-except Exception as e:
-    client = None
-    sheet = None
-    print(f"❌ Gagal autentikasi atau membuka spreadsheet: {str(e)}")
-    traceback.print_exc()
 
+except Exception as e:
+    print("❌ Gagal autentikasi atau membuka spreadsheet:", e)
+    traceback.print_exc()
 
 @app.route('/lomba', methods=['GET', 'POST'])
 def jenis_lomba():
