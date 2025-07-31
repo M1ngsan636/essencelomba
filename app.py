@@ -154,6 +154,7 @@ def skoring():
     return render_template("skoring.html", jenis_list=jenis_list, tim_by_jenis=tim_by_jenis)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    import os
+    port = int(os.environ.get("PORT", 8080))  # Gunakan PORT dari Railway
+    app.run(host='0.0.0.0', port=port, debug=True)
 
