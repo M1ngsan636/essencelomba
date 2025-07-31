@@ -27,6 +27,11 @@ try:
         raise Exception("GOOGLE_CREDS_JSON environment variable not found.")
 
     creds_dict = json.loads(creds_json)
+
+    # 🔧 Perbaikan khusus untuk Railway — ubah \n menjadi baris baru asli
+    if "private_key" in creds_dict:
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
