@@ -8,49 +8,55 @@ import os
 app = Flask(__name__)
 app.secret_key = 'rahasia'  # Untuk flash messages
 
-# Setup koneksi ke Google Sheets
+SPREADSHEET_ID = "1u15SGd-ihsXwHMbw6kfWZzsfZnqaf2qIH-kFeNmQb4g"
+
 scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/spreadsheets"
 ]
 
-client = None
-spreadsheet = None
-sheet = None
-SPREADSHEET_ID = "1u15SGd-ihsXwHMbw6kfWZzsfZnqaf2qIH-kFeNmQb4g"
-
-try:
-    # Load credentials dari environment variable
-    creds_json = os.getenv("GOOGLE_CREDS_JSON")
-    if not creds_json:
-        raise Exception("GOOGLE_CREDS_JSON environment variable not found.")
-
-    creds_dict = json.loads(creds_json)
-
-    # 🔧 Perbaikan khusus untuk Railway — ubah \n menjadi baris baru asli
-    if "private_key" in creds_dict:
-        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-    client = gspread.authorize(creds)
-
-    # Buka spreadsheet
-    spreadsheet = client.open_by_key(SPREADSHEET_ID)
-
-    # Buka / buat sheet "JenisLomba"
+def get_client():
     try:
-        sheet = spreadsheet.worksheet("JenisLomba")
-    except gspread.exceptions.WorksheetNotFound:
-        sheet = spreadsheet.add_worksheet(title="JenisLomba", rows=100, cols=2)
-        sheet.append_row(["Nama Lomba"])
+        creds_json = os.getenv("GOOGLE_CREDS_JSON")
+        if not creds_json:
+            raise Exception("GOOGLE_CREDS_JSON tidak ditemukan.")
 
-except Exception as e:
-    print("❌ Gagal autentikasi atau membuka spreadsheet:", e)
-    traceback.print_exc()
+        creds_dict = json.loads(creds_json)
+        if "private_key" in creds_dict:
+            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        return gspread.authorize(creds)
+    except Exception as e:
+        print("❌ Gagal autentikasi:", e)
+        traceback.print_exc()
+        return None
+
+@app.route('/')
+def home():
+    return redirect('/home')
+
+@app.route('/home')
+def landing_page():
+    return render_template('home.html')
 
 @app.route('/lomba', methods=['GET', 'POST'])
 def jenis_lomba():
+    client = get_client()
+    if not client:
+        return "❌ Gagal koneksi ke Google Sheets.", 500
+
+    try:
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        try:
+            sheet = spreadsheet.worksheet("JenisLomba")
+        except gspread.exceptions.WorksheetNotFound:
+            sheet = spreadsheet.add_worksheet(title="JenisLomba", rows=100, cols=2)
+            sheet.append_row(["Nama Lomba"])
+    except Exception as e:
+        return f"Gagal membuka spreadsheet: {e}", 500
+
     if request.method == 'POST':
         nama_jenis = request.form.get('jenis')
         if nama_jenis:
@@ -65,20 +71,27 @@ def jenis_lomba():
     jenis_list = [{"jenis": row[0]} for row in jenis_values if row]
     return render_template('lomba.html', jenis_list=jenis_list)
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register_team():
+    client = get_client()
+    if not client:
+        return "❌ Gagal koneksi ke Google Sheets.", 500
+
+    try:
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        reg_sheet = spreadsheet.worksheet("Registrasi")
+    except gspread.exceptions.WorksheetNotFound:
+        reg_sheet = spreadsheet.add_worksheet(title="Registrasi", rows=200, cols=10)
+        reg_sheet.append_row(["Nama Tim", "Jenis Lomba"] + [f"Anggota {i}" for i in range(1, 8)])
+    except Exception as e:
+        return f"Gagal membuka sheet Registrasi: {e}", 500
+
     if request.method == 'POST':
         nama_tim = request.form.get('nama_tim')
         jenis_lomba = request.form.get('jenis_lomba')
-
-        anggota = []
-        for i in range(1, 8):
-            anggota_i = request.form.get(f'anggota{i}')
-            anggota.append(anggota_i if anggota_i else "")  # Isi kosong jika tidak diisi
+        anggota = [request.form.get(f'anggota{i}', "") for i in range(1, 8)]
 
         try:
-            reg_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("Registrasi")
             headers = reg_sheet.row_values(1)
             expected_headers = ["Nama Tim", "Jenis Lomba"] + [f"Anggota {i}" for i in range(1, 8)]
             if headers != expected_headers:
@@ -89,50 +102,39 @@ def register_team():
             flash(f"✅ Tim '{nama_tim}' berhasil didaftarkan!", "success")
         except Exception as e:
             flash(f"❌ Gagal menyimpan data: {e}", "danger")
-            traceback.print_exc()
 
         return redirect('/register')
 
-    # Ambil list jenis lomba dari worksheet
     try:
-        jenis_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("JenisLomba")
-        jenis_list = jenis_sheet.col_values(1)[1:]  # Skip header
-    except Exception as e:
-        print("❌ Gagal mengambil jenis lomba:", e)
+        jenis_sheet = spreadsheet.worksheet("JenisLomba")
+        jenis_list = jenis_sheet.col_values(1)[1:]
+    except:
         jenis_list = []
 
     return render_template('register.html', jenis_list=jenis_list)
 
-
-@app.route('/')
-def home():
-    return redirect('/home')
-
-@app.route('/home')
-def landing_page():
-    return render_template('home.html')
-
 @app.route('/skoring', methods=['GET', 'POST'])
 def skoring():
-    jenis_list = []
-    tim_by_jenis = {}
+    client = get_client()
+    if not client:
+        return "❌ Gagal koneksi ke Google Sheets.", 500
 
     try:
-        jenis_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("JenisLomba")
-        jenis_list = jenis_sheet.col_values(1)[1:]  # Skip header
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        jenis_sheet = spreadsheet.worksheet("JenisLomba")
+        reg_sheet = spreadsheet.worksheet("Registrasi")
 
-        reg_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("Registrasi")
-        data = reg_sheet.get_all_values()[1:]  # Skip header
+        jenis_list = jenis_sheet.col_values(1)[1:]
+        data = reg_sheet.get_all_values()[1:]
+
+        tim_by_jenis = {}
         for row in data:
             if len(row) >= 2:
                 jenis = row[1]
                 nama_tim = row[0]
-                if jenis not in tim_by_jenis:
-                    tim_by_jenis[jenis] = []
-                tim_by_jenis[jenis].append(nama_tim)
+                tim_by_jenis.setdefault(jenis, []).append(nama_tim)
     except Exception as e:
-        print("❌ Gagal mengambil data registrasi atau jenis:", e)
-        traceback.print_exc()
+        return f"Gagal mengambil data: {e}", 500
 
     if request.method == 'POST':
         jenis_lomba = request.form.get('jenis_lomba')
@@ -142,24 +144,21 @@ def skoring():
         pemenang = request.form.get('pemenang')
 
         try:
-            skor_sheet = client.open_by_key(SPREADSHEET_ID).worksheet("Skoring")
-        except gspread.exceptions.WorksheetNotFound:
-            skor_sheet = spreadsheet.add_worksheet(title="Skoring", rows=100, cols=6)
-            skor_sheet.append_row(["Jenis Lomba", "Babak", "Tim A", "Tim B", "Pemenang"])
+            try:
+                skor_sheet = spreadsheet.worksheet("Skoring")
+            except gspread.exceptions.WorksheetNotFound:
+                skor_sheet = spreadsheet.add_worksheet(title="Skoring", rows=100, cols=5)
+                skor_sheet.append_row(["Jenis Lomba", "Babak", "Tim A", "Tim B", "Pemenang"])
 
-        try:
             skor_sheet.append_row([jenis_lomba, babak, tim_a, tim_b, pemenang])
             flash("✅ Skor berhasil disimpan!", "success")
         except Exception as e:
             flash(f"❌ Gagal menyimpan skor: {e}", "danger")
-            traceback.print_exc()
 
         return redirect('/skoring')
 
     return render_template("skoring.html", jenis_list=jenis_list, tim_by_jenis=tim_by_jenis)
 
 if __name__ == '__main__':
-    import os
-    port = int(os.environ.get("PORT", 8080))  # Gunakan PORT dari Railway
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
