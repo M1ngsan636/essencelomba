@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skoring Lomba - 80 Tahun Indonesia Merdeka</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+  <style>
+    :root {
+      --merah: #e70011;
+      --putih: #ffffff;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Poppins', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+      color: #333;
+      background-image: linear-gradient(to bottom, rgba(231, 0, 17, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Header dengan Bendera */
+    .header {
+      background: linear-gradient(to right, var(--merah) 50%, var(--putih) 50%);
+      height: 80px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    /* Logo 80 Tahun Indonesia Merdeka */
+    .logo-merdeka {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .logo-container {
+      background-color: var(--putih);
+      border: 3px solid var(--merah);
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-80 {
+      font-size: 4rem;
+      font-weight: bold;
+      color: var(--merah);
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo-text {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .logo-text h1 {
+      color: var(--merah);
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .logo-text p {
+      color: #333;
+      margin: 5px 0 0;
+      font-size: 1rem;
+    }
+
+    /* Garis Merah-Putih */
+    .garis-merah-putih {
+      height: 10px;
+      width: 80%;
+      max-width: 800px;
+      background: linear-gradient(to right, 
+        var(--merah) 0%, var(--merah) 20%, 
+        var(--putih) 20%, var(--putih) 40%, 
+        var(--merah) 40%, var(--merah) 60%, 
+        var(--putih) 60%, var(--putih) 80%, 
+        var(--merah) 80%, var(--merah) 100%);
+      margin: 20px auto;
+    }
+
+    /* Konten Utama */
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      color: var(--merah);
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 100px;
+      height: 3px;
+      background: var(--merah);
+      margin: 10px auto;
+    }
+
+    /* Form */
+    .form-container {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      border-top: 5px solid var(--merah);
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    label {
+      font-weight: 600;
+      color: #555;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    select {
+      width: calc(100% - 24px);
+      padding: 12px;
+      margin: 10px 0 15px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Poppins', sans-serif;
+      transition: border 0.3s;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: var(--merah);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(231, 0, 17, 0.2);
+    }
+
+    /* Tombol */
+    .btn {
+      background-color: var(--merah);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: var(--shadow);
+      font-size: 1rem;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background-color: #c5000e;
+      transform: translateY(-2px);
+    }
+
+    /* Flash Messages */
+    .flash-messages {
+      margin-bottom: 20px;
+    }
+
+    .flash {
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .footer p {
+      margin: 5px 0;
+    }
+
+    /* Efek Garuda */
+    .garuda-effect {
+      position: absolute;
+      opacity: 0.05;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23e70011" d="M50 10L60 40H90L65 60L75 90L50 70L25 90L35 60L10 40H40Z"/></svg>');
+      background-repeat: repeat;
+      pointer-events: none;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+      .logo-container {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .logo-80 {
+        font-size: 3rem;
+      }
+      
+      .logo-text h1 {
+        font-size: 1.4rem;
+      }
+      
+      .container {
+        width: 95%;
+        padding: 10px;
+      }
+    }
+        .header-logos {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 2;
+}
+
+.logo-kiri, .logo-kanan {
+  height: 150px;
+  width: auto;
+}
+  </style>
+</head>
+<body>
+  <!-- Header dengan Bendera -->
+  <header class="header">
+    <div class="garuda-effect"></div>
+  </header>
+
+  <!-- Logo Merdeka -->
+    <div class="header-logos">
+      <img src="{{ url_for('static', filename='images/logo1.png') }}" alt="Logo Kiri" class="logo-kiri">
+      <img src="{{ url_for('static', filename='images/logo2.png') }}" alt="Logo Kanan" class="logo-kanan">
+    </div>
+    <div class="logo-text">
+      <h1>INDONESIA MERDEKA</h1>
+      <p>17 Agustus 1945 - 17 Agustus 2025</p>
+    </div>
+  </div>
+
+  <!-- Garis Merah Putih -->
+  <div class="garis-merah-putih"></div>
+
+  <!-- Konten Utama -->
+  <main class="container">
+    <h2>Input Skoring Lomba</h2>
+
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="form-container">
+      <form method="POST">
+        <label for="jenis_lomba">Jenis Lomba</label>
+        <select name="jenis_lomba" id="jenis_lomba" required onchange="updateTeams()">
+          <option value="">-- Pilih Jenis Lomba --</option>
+          {% for jenis in jenis_list %}
+            <option value="{{ jenis }}">{{ jenis }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="babak">Babak</label>
+        <select name="babak" id="babak" required>
+        <option value="">-- Pilih Babak --</option>
+        <option value="Penyisihan">Penyisihan</option>
+        <option value="Semi Final">Semi Final</option>
+        <option value="Final">Final</option>
+        </select>
+
+        <label for="tim_a">Nama Tim A</label>
+        <select name="tim_a" id="tim_a" required></select>
+
+        <label for="tim_b">Nama Tim B</label>
+        <select name="tim_b" id="tim_b" required></select>
+
+        <label for="pemenang">Nama Tim Pemenang</label>
+        <select name="pemenang" id="pemenang" required>
+          <option value="">-- Pilih Pemenang --</option>
+        </select>
+
+        <button type="submit" class="btn">Simpan Skor</button>
+      </form>
+    </div>
+  </main>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <a href="/" style="text-decoration: none;">
+        <button style="background-color: red; color: white; border: none; padding: 10px 20px; border-radius: 5px;">🏠 Home</button>
+    </a>
+    </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Panitia HUT RI ke-80. Semua hak dilindungi.</p>
+    <p>Dirgahayu Indonesia ke-80! Merdeka!</p>
+        <p>Grand Batavia Cluster Essence</p>
+  </footer>
+
+  <script>
+    const timData = JSON.parse(`{{ tim_by_jenis|tojson | safe }}`);
+
+    function updateTeams() {
+      const jenis = document.getElementById("jenis_lomba").value;
+      const timASelect = document.getElementById("tim_a");
+      const timBSelect = document.getElementById("tim_b");
+
+      timASelect.innerHTML = '';
+      timBSelect.innerHTML = '';
+
+      if (jenis && timData[jenis]) {
+        timData[jenis].forEach(nama => {
+          const optA = document.createElement("option");
+          optA.value = nama;
+          optA.text = nama;
+          timASelect.appendChild(optA);
+
+          const optB = document.createElement("option");
+          optB.value = nama;
+          optB.text = nama;
+          timBSelect.appendChild(optB);
+        });
+      }
+
+      updatePemenangDropdown();
+    }
+
+    function updatePemenangDropdown() {
+      const timA = document.getElementById("tim_a").value;
+      const timB = document.getElementById("tim_b").value;
+      const pemenang = document.getElementById("pemenang");
+
+      pemenang.innerHTML = '';
+
+      if (timA) {
+        const optA = document.createElement("option");
+        optA.value = timA;
+        optA.text = timA;
+        pemenang.appendChild(optA);
+      }
+
+      if (timB && timB !== timA) {
+        const optB = document.createElement("option");
+        optB.value = timB;
+        optB.text = timB;
+        pemenang.appendChild(optB);
+      }
+
+      const kosong = document.createElement("option");
+      kosong.value = '';
+      kosong.text = '-- Pilih Pemenang --';
+      pemenang.insertBefore(kosong, pemenang.firstChild);
+      pemenang.value = '';
+    }
+
+    document.getElementById("tim_a").addEventListener("change", updatePemenangDropdown);
+    document.getElementById("tim_b").addEventListener("change", updatePemenangDropdown);
+  </script>
+</body>
+</html>

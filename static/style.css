@@ -1,0 +1,207 @@
+/* Gaya Utama untuk Web App 17 Agustus 2025 */
+:root {
+  --merah: #e70011;
+  --putih: #ffffff;
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Poppins', 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f8f8;
+  color: #333;
+  background-image: linear-gradient(to bottom, rgba(231, 0, 17, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%);
+}
+
+/* Header dengan Bendera */
+.header {
+  background: linear-gradient(to right, var(--merah) 50%, var(--putih) 50%);
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+/* Logo 80 Tahun Indonesia Merdeka */
+.logo-merdeka {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.logo-container {
+  background-color: var(--putih);
+  border: 3px solid var(--merah);
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-80 {
+  font-size: 4rem;
+  font-weight: bold;
+  color: var(--merah);
+  position: relative;
+  z-index: 2;
+}
+
+.logo-text {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.logo-text h1 {
+  color: var(--merah);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.logo-text p {
+  color: #333;
+  margin: 5px 0 0;
+  font-size: 1rem;
+}
+
+/* Garis Merah-Putih */
+.garis-merah-putih {
+  height: 10px;
+  background: linear-gradient(to right, 
+    var(--merah) 0%, var(--merah) 20%, 
+    var(--putih) 20%, var(--putih) 40%, 
+    var(--merah) 40%, var(--merah) 60%, 
+    var(--putih) 60%, var(--putih) 80%, 
+    var(--merah) 80%, var(--merah) 100%);
+  margin: 20px 0;
+}
+
+/* Konten Utama */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  color: var(--merah);
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+h2::after {
+  content: "";
+  display: block;
+  width: 100px;
+  height: 3px;
+  background: var(--merah);
+  margin: 10px auto;
+}
+
+/* Tombol */
+.btn {
+  background-color: var(--merah);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  box-shadow: var(--shadow);
+}
+
+.btn:hover {
+  background-color: #c5000e;
+  transform: translateY(-2px);
+}
+
+/* Kartu Acara */
+.event-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  border-top: 5px solid var(--merah);
+}
+
+.event-card h3 {
+  color: var(--merah);
+  margin-top: 0;
+}
+
+/* Footer */
+.footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+
+/* Efek Garuda (opsional) */
+.garuda-effect {
+  position: absolute;
+  opacity: 0.05;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23e70011" d="M50 10L60 40H90L65 60L75 90L50 70L25 90L35 60L10 40H40Z"/></svg>');
+  background-repeat: repeat;
+  pointer-events: none;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .logo-container {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .logo-80 {
+    font-size: 3rem;
+  }
+  
+  .logo-text h1 {
+    font-size: 1.4rem;
+  }
+}
+.flash-messages {
+  margin: 0 auto 20px;
+  max-width: 600px;
+}
+
+.flash {
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.flash-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.flash-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.flash-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
