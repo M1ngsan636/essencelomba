@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import traceback
+import json
 
 app = Flask(__name__)
 app.secret_key = 'rahasia'  # Untuk flash messages
@@ -12,6 +13,9 @@ scope = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/spreadsheets"
 ]
+import os
+creds_dict = json.loads(os.getenv("GOOGLE_CREDS_JSON"))
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
 try:
     creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
