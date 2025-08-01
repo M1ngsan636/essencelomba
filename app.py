@@ -158,6 +158,23 @@ def skoring():
         return redirect('/skoring')
 
     return render_template("skoring.html", jenis_list=jenis_list, tim_by_jenis=tim_by_jenis)
+@app.route('/hasil')
+def hasil():
+    client = get_client()
+    if not client:
+        return "❌ Gagal koneksi ke Google Sheets.", 500
+
+    try:
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        try:
+            skor_sheet = spreadsheet.worksheet("Skoring")
+        except gspread.exceptions.WorksheetNotFound:
+            return "❌ Sheet 'Skoring' belum tersedia.", 500
+
+        data = skor_sheet.get_all_records()
+        return render_template('hasil.html', data=data)
+    except Exception as e:
+        return f"❌ Gagal mengambil data dari Google Sheets: {e}"
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
